@@ -19,6 +19,10 @@ import ReactFlow, {
 
 import { Button } from "@/components/ui/button"
 import {
+  ButtonGroup,
+  ButtonGroupSeparator,
+} from "@/components/ui/button-group"
+import {
   Sheet,
   SheetContent,
   SheetDescription,
@@ -27,6 +31,23 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet"
 import { Input } from "@/components/ui/input"
+import {
+  Field,
+  FieldContent,
+  FieldDescription,
+  FieldGroup,
+  FieldLabel,
+  FieldLegend,
+  FieldSeparator,
+  FieldSet,
+} from "@/components/ui/field"
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupInput,
+  InputGroupText,
+  InputGroupTextarea,
+} from "@/components/ui/input-group"
 import { cn } from "@/lib/utils"
 
 import "reactflow/dist/style.css"
@@ -496,11 +517,11 @@ export function ProcessEditorWorkspace() {
     items: ExchangeEdge[],
     direction: "incoming" | "outgoing"
   ) => (
-    <div className="space-y-2">
-      <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+    <FieldSet className="gap-2">
+      <FieldLegend className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
         {title}
-      </p>
-      <div className="space-y-1 rounded-lg border border-dashed bg-muted/40 p-2 text-xs">
+      </FieldLegend>
+      <FieldGroup className="rounded-lg border border-dashed bg-muted/40 p-2 text-xs">
         {items.length === 0 ? (
           <p className="text-muted-foreground">No {direction} exchanges</p>
         ) : (
@@ -538,60 +559,106 @@ export function ProcessEditorWorkspace() {
             )
           })
         )}
-      </div>
-    </div>
+      </FieldGroup>
+    </FieldSet>
   )
 
   const renderNodeInspector = () => {
     if (!selectedNode) return null
+    const categoryInputId = `node-category-${selectedNode.id}`
+    const descriptionInputId = `node-description-${selectedNode.id}`
+    const amountInputId = `node-amount-${selectedNode.id}`
+
     return (
-      <div className="space-y-4 text-sm">
-        <div className="space-y-2">
-          <label className="flex flex-col gap-1 text-sm">
-            <span className="text-muted-foreground">Category</span>
-            <Input
-              value={selectedNode.data.category ?? ""}
-              onChange={(event) =>
-                updateNodeData(selectedNode.id, (data) => ({
-                  ...data,
-                  category: event.target.value || undefined,
-                }))
-              }
-              placeholder="e.g. Manufacturing"
-            />
-          </label>
-          <label className="flex flex-col gap-1 text-sm">
-            <span className="text-muted-foreground">Description</span>
-            <Input
-              value={selectedNode.data.description ?? ""}
-              onChange={(event) =>
-                updateNodeData(selectedNode.id, (data) => ({
-                  ...data,
-                  description: event.target.value || undefined,
-                }))
-              }
-              placeholder="Optional supporting context"
-            />
-          </label>
-          <label className="flex flex-col gap-1 text-sm">
-            <span className="text-muted-foreground">Production amount</span>
-            <Input
-              type="number"
-              inputMode="decimal"
-              step="0.01"
-              value={selectedNode.data.productionAmount ?? 1}
-              onChange={(event) => {
-                const parsed = Number.parseFloat(event.target.value)
-                updateNodeData(selectedNode.id, (data) => ({
-                  ...data,
-                  productionAmount:
-                    Number.isNaN(parsed) || parsed <= 0 ? 1 : parsed,
-                }))
-              }}
-              placeholder="1"
-            />
-          </label>
-        </div>
+      <div className="space-y-6 text-sm">
+        <FieldSet className="gap-4">
+          <Field>
+            <FieldLabel htmlFor={categoryInputId}>Category</FieldLabel>
+            <FieldContent>
+              <InputGroup>
+                <InputGroupAddon>
+                  <InputGroupText>Group</InputGroupText>
+                </InputGroupAddon>
+                <InputGroupInput
+                  id={categoryInputId}
+                  value={selectedNode.data.category ?? ""}
+                  onChange={(event) =>
+                    updateNodeData(selectedNode.id, (data) => ({
+                      ...data,
+                      category: event.target.value || undefined,
+                    }))
+                  }
+                  placeholder="Manufacturing, logistics..."
+                />
+              </InputGroup>
+              <FieldDescription>
+                Optional label to cluster processes in dashboards.
+              </FieldDescription>
+            </FieldContent>
+          </Field>
+
+          <Field>
+            <FieldLabel htmlFor={descriptionInputId}>Description</FieldLabel>
+            <FieldContent>
+              <InputGroup className="h-auto">
+                <InputGroupAddon align="block-start">
+                  <InputGroupText>Notes</InputGroupText>
+                </InputGroupAddon>
+                <InputGroupTextarea
+                  id={descriptionInputId}
+                  value={selectedNode.data.description ?? ""}
+                  onChange={(event) =>
+                    updateNodeData(selectedNode.id, (data) => ({
+                      ...data,
+                      description: event.target.value || undefined,
+                    }))
+                  }
+                  placeholder="Provide optional context for collaborators."
+                  rows={3}
+                />
+              </InputGroup>
+            </FieldContent>
+          </Field>
+
+          <Field>
+            <FieldLabel htmlFor={amountInputId}>
+              Production amount
+            </FieldLabel>
+            <FieldContent>
+              <InputGroup>
+                <InputGroupAddon>
+                  <InputGroupText>Qty</InputGroupText>
+                </InputGroupAddon>
+                <InputGroupInput
+                  id={amountInputId}
+                  type="number"
+                  inputMode="decimal"
+                  step="0.01"
+                  value={selectedNode.data.productionAmount ?? 1}
+                  onChange={(event) => {
+                    const parsed = Number.parseFloat(event.target.value)
+                    updateNodeData(selectedNode.id, (data) => ({
+                      ...data,
+                      productionAmount:
+                        Number.isNaN(parsed) || parsed <= 0 ? 1 : parsed,
+                    }))
+                  }}
+                  placeholder="1"
+                />
+                <InputGroupAddon align="inline-end">
+                  <InputGroupText className="text-xs uppercase tracking-wide">
+                    per ref.
+                  </InputGroupText>
+                </InputGroupAddon>
+              </InputGroup>
+              <FieldDescription>
+                Reference flow used when scaling connected exchanges.
+              </FieldDescription>
+            </FieldContent>
+          </Field>
+        </FieldSet>
+
+        <FieldSeparator />
 
         {renderEdgeList("Incoming exchanges", incomingEdges, "incoming")}
         {renderEdgeList("Outgoing exchanges", outgoingEdges, "outgoing")}
@@ -607,73 +674,116 @@ export function ProcessEditorWorkspace() {
   const renderEdgeInspector = () => {
     if (!selectedEdge) return null
     const data = (selectedEdge.data ?? { amount: 1 }) as ExchangeEdgeData
+    const labelInputId = `edge-label-${selectedEdge.id}`
+    const flowTypeInputId = `edge-flow-${selectedEdge.id}`
+    const amountInputId = `edge-amount-${selectedEdge.id}`
+    const unitInputId = `edge-unit-${selectedEdge.id}`
+
     return (
-      <div className="space-y-4 text-sm">
-        <div className="space-y-2">
-          <label className="flex flex-col gap-1 text-sm">
-            <span className="text-muted-foreground">Exchange label</span>
-            <Input
-              value={data.label ?? ""}
-              onChange={(event) =>
-                handleEdgeLabelChange(selectedEdge.id, event.target.value)
-              }
-              placeholder="Electricity - EU mix"
-            />
-          </label>
-          <label className="flex flex-col gap-1 text-sm">
-            <span className="text-muted-foreground">Flow type</span>
-            <Input
-              value={data.flowType ?? ""}
-              onChange={(event) =>
-                handleEdgeFlowTypeChange(selectedEdge.id, event.target.value)
-              }
-              placeholder="Material, energy, emission..."
-            />
-          </label>
-          <div className="grid gap-3 sm:grid-cols-2">
-            <label className="flex flex-col gap-1 text-sm">
-              <span className="text-muted-foreground">Amount</span>
-              <Input
-                type="number"
-                inputMode="decimal"
-                step="0.01"
-                value={data.amount}
-                onChange={(event) =>
-                  handleEdgeAmountChange(selectedEdge.id, event.target.value)
-                }
-              />
-            </label>
-            <label className="flex flex-col gap-1 text-sm">
-              <span className="text-muted-foreground">Unit</span>
-              <Input
-                value={data.unit ?? ""}
-                onChange={(event) =>
-                  handleEdgeUnitChange(selectedEdge.id, event.target.value)
-                }
-                placeholder="kWh, kg, m³..."
-              />
-            </label>
+      <div className="space-y-6 text-sm">
+        <FieldSet className="gap-4">
+          <Field>
+            <FieldLabel htmlFor={labelInputId}>Exchange label</FieldLabel>
+            <FieldContent>
+              <InputGroup>
+                <InputGroupAddon>
+                  <InputGroupText>Label</InputGroupText>
+                </InputGroupAddon>
+                <InputGroupInput
+                  id={labelInputId}
+                  value={data.label ?? ""}
+                  onChange={(event) =>
+                    handleEdgeLabelChange(selectedEdge.id, event.target.value)
+                  }
+                  placeholder="Electricity - EU mix"
+                />
+              </InputGroup>
+            </FieldContent>
+          </Field>
+
+          <Field>
+            <FieldLabel htmlFor={flowTypeInputId}>Flow type</FieldLabel>
+            <FieldContent>
+              <InputGroup>
+                <InputGroupAddon>
+                  <InputGroupText>Type</InputGroupText>
+                </InputGroupAddon>
+                <InputGroupInput
+                  id={flowTypeInputId}
+                  value={data.flowType ?? ""}
+                  onChange={(event) =>
+                    handleEdgeFlowTypeChange(selectedEdge.id, event.target.value)
+                  }
+                  placeholder="Material, energy, emission..."
+                />
+              </InputGroup>
+              <FieldDescription>
+                Helps categorise exchanges in analytics.
+              </FieldDescription>
+            </FieldContent>
+          </Field>
+
+          <div className="grid gap-4 sm:grid-cols-2">
+            <Field>
+              <FieldLabel htmlFor={amountInputId}>Amount</FieldLabel>
+              <FieldContent>
+                <InputGroup>
+                  <InputGroupAddon>
+                    <InputGroupText>Qty</InputGroupText>
+                  </InputGroupAddon>
+                  <InputGroupInput
+                    id={amountInputId}
+                    type="number"
+                    inputMode="decimal"
+                    step="0.01"
+                    value={data.amount}
+                    onChange={(event) =>
+                      handleEdgeAmountChange(selectedEdge.id, event.target.value)
+                    }
+                  />
+                </InputGroup>
+              </FieldContent>
+            </Field>
+            <Field>
+              <FieldLabel htmlFor={unitInputId}>Unit</FieldLabel>
+              <FieldContent>
+                <InputGroup>
+                  <InputGroupAddon>
+                    <InputGroupText>Unit</InputGroupText>
+                  </InputGroupAddon>
+                  <InputGroupInput
+                    id={unitInputId}
+                    value={data.unit ?? ""}
+                    onChange={(event) =>
+                      handleEdgeUnitChange(selectedEdge.id, event.target.value)
+                    }
+                    placeholder="kWh, kg, m³..."
+                  />
+                </InputGroup>
+              </FieldContent>
+            </Field>
           </div>
-        </div>
-        <div className="rounded-lg border border-dashed bg-muted/40 p-3 text-xs">
-          <p className="font-semibold uppercase tracking-wide text-muted-foreground">
+        </FieldSet>
+
+        <FieldSet className="gap-2">
+          <FieldLegend className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
             Connected processes
-          </p>
-          <ul className="mt-2 space-y-1 text-muted-foreground">
-            <li>
-              Source:{" "}
+          </FieldLegend>
+          <FieldGroup className="rounded-lg border border-dashed bg-muted/40 p-3 text-xs">
+            <span className="flex items-center justify-between gap-2">
+              <span className="text-muted-foreground">Source</span>
               <span className="font-medium text-foreground">
                 {nodeLabelLookup(selectedEdge.source)}
               </span>
-            </li>
-            <li>
-              Target:{" "}
+            </span>
+            <span className="flex items-center justify-between gap-2">
+              <span className="text-muted-foreground">Target</span>
               <span className="font-medium text-foreground">
                 {nodeLabelLookup(selectedEdge.target)}
               </span>
-            </li>
-          </ul>
-        </div>
+            </span>
+          </FieldGroup>
+        </FieldSet>
       </div>
     )
   }
@@ -732,191 +842,298 @@ export function ProcessEditorWorkspace() {
               amounts inline.
             </p>
           </div>
-          <div className="flex flex-wrap gap-2">
-            <Sheet
-              open={activeSheet === "process"}
-              onOpenChange={(open) => {
-                setActiveSheet(open ? "process" : null)
-                if (!open) processFormRef.current?.reset()
-              }}
-            >
-              <SheetContent side="right" className="w-[420px] sm:w-[480px]">
-                <SheetHeader>
-                  <SheetTitle>New process</SheetTitle>
-                  <SheetDescription>
-                    Describe the process, set its production amount, and place it
-                    on the canvas.
-                  </SheetDescription>
-                </SheetHeader>
-                <form
-                  ref={processFormRef}
-                  className="flex flex-col gap-4 py-4"
-                  onSubmit={handleAddProcess}
-                >
-                  <label className="flex flex-col gap-1 text-sm">
-                    <span className="text-muted-foreground">Process name</span>
-                    <Input
-                      name="process-name"
-                      placeholder="Cathode drying EU"
-                      required
-                    />
-                  </label>
-                  <label className="flex flex-col gap-1 text-sm">
-                    <span className="text-muted-foreground">Category</span>
-                    <Input
-                      name="process-category"
-                      placeholder="Manufacturing"
-                    />
-                  </label>
-                  <label className="flex flex-col gap-1 text-sm">
-                    <span className="text-muted-foreground">
-                      Production amount
-                    </span>
-                    <Input
-                      name="process-amount"
-                      type="number"
-                      inputMode="decimal"
-                      step="0.01"
-                      placeholder="1"
-                      defaultValue="1"
-                    />
-                  </label>
-                  <label className="flex flex-col gap-1 text-sm">
-                    <span className="text-muted-foreground">Description</span>
-                    <Input
-                      name="process-description"
-                      placeholder="Optional supporting context"
-                    />
-                  </label>
-                  <SheetFooter className="gap-2 sm:flex-row sm:justify-end">
-                    <Button
-                      type="button"
-                      variant="outline"
-                      onClick={() => setActiveSheet(null)}
-                    >
-                      Cancel
-                    </Button>
-                    <Button type="submit">Create process</Button>
-                  </SheetFooter>
-                </form>
-              </SheetContent>
+          <div className="flex flex-wrap items-center gap-2">
+            <ButtonGroup>
               <Button
                 variant="secondary"
+                size="sm"
                 onClick={() => setActiveSheet("process")}
               >
                 New process
               </Button>
-            </Sheet>
-
-            <Sheet
-              open={activeSheet === "exchange"}
-              onOpenChange={(open) => {
-                setActiveSheet(open ? "exchange" : null)
-                if (!open) exchangeFormRef.current?.reset()
-              }}
-            >
-              <SheetContent side="right" className="w-[420px] sm:w-[480px]">
-                <SheetHeader>
-                  <SheetTitle>New exchange</SheetTitle>
-                  <SheetDescription>
-                    Connect two processes with a quantified exchange.
-                  </SheetDescription>
-                </SheetHeader>
-                <form
-                  ref={exchangeFormRef}
-                  className="flex flex-col gap-4 py-4"
-                  onSubmit={handleAddExchange}
-                >
-                  <div className="grid gap-3 sm:grid-cols-2">
-                    <label className="flex flex-col gap-1 text-sm">
-                      <span className="text-muted-foreground">Source</span>
-                      <select
-                        name="exchange-source"
-                        className="rounded-md border border-input bg-background px-3 py-2 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-                        defaultValue=""
-                        required
-                      >
-                        <option value="">Select process</option>
-                        {processOptions.map((option) => (
-                          <option key={option.id} value={option.id}>
-                            {option.label}
-                          </option>
-                        ))}
-                      </select>
-                    </label>
-                    <label className="flex flex-col gap-1 text-sm">
-                      <span className="text-muted-foreground">Target</span>
-                      <select
-                        name="exchange-target"
-                        className="rounded-md border border-input bg-background px-3 py-2 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-                        defaultValue=""
-                        required
-                      >
-                        <option value="">Select process</option>
-                        {processOptions.map((option) => (
-                          <option key={option.id} value={option.id}>
-                            {option.label}
-                          </option>
-                        ))}
-                      </select>
-                    </label>
-                  </div>
-                  <label className="flex flex-col gap-1 text-sm">
-                    <span className="text-muted-foreground">Exchange label</span>
-                    <Input
-                      name="exchange-name"
-                      placeholder="Electricity - EU mix"
-                    />
-                  </label>
-                  <div className="grid gap-3 sm:grid-cols-2">
-                    <label className="flex flex-col gap-1 text-sm">
-                      <span className="text-muted-foreground">Flow type</span>
-                      <Input
-                        name="exchange-flow-type"
-                        placeholder="Material, energy, emission..."
-                      />
-                    </label>
-                    <label className="flex flex-col gap-1 text-sm">
-                      <span className="text-muted-foreground">Unit</span>
-                      <Input
-                        name="exchange-unit"
-                        placeholder="kWh, kg, m³..."
-                      />
-                    </label>
-                  </div>
-                  <label className="flex flex-col gap-1 text-sm">
-                    <span className="text-muted-foreground">Amount</span>
-                    <Input
-                      name="exchange-amount"
-                      type="number"
-                      inputMode="decimal"
-                      step="0.01"
-                      placeholder="Enter quantity"
-                      defaultValue="1"
-                      required
-                    />
-                  </label>
-                  <SheetFooter className="gap-2 sm:flex-row sm:justify-end">
-                    <Button
-                      type="button"
-                      variant="outline"
-                      onClick={() => setActiveSheet(null)}
-                    >
-                      Cancel
-                    </Button>
-                    <Button type="submit">Create exchange</Button>
-                  </SheetFooter>
-                </form>
-              </SheetContent>
+              <ButtonGroupSeparator />
               <Button
                 variant="secondary"
+                size="sm"
                 onClick={() => setActiveSheet("exchange")}
                 disabled={processOptions.length < 2}
               >
                 New exchange
               </Button>
-            </Sheet>
+            </ButtonGroup>
           </div>
+
+          <Sheet
+            open={activeSheet === "process"}
+            onOpenChange={(open) => {
+              setActiveSheet(open ? "process" : null)
+              if (!open) processFormRef.current?.reset()
+            }}
+          >
+            <SheetContent side="right" className="w-[420px] sm:w-[480px]">
+              <SheetHeader>
+                <SheetTitle>New process</SheetTitle>
+                <SheetDescription>
+                  Describe the process, set its production amount, and place it
+                  on the canvas.
+                </SheetDescription>
+              </SheetHeader>
+              <form ref={processFormRef} onSubmit={handleAddProcess}>
+                <FieldSet className="gap-6 p-4">
+                  <Field>
+                    <FieldLabel htmlFor="process-name">Process name</FieldLabel>
+                    <FieldContent>
+                      <Input
+                        id="process-name"
+                        name="process-name"
+                        placeholder="Cathode drying EU"
+                        required
+                      />
+                      <FieldDescription>
+                        This label appears on the canvas node and in
+                        exchange lists.
+                      </FieldDescription>
+                    </FieldContent>
+                  </Field>
+                  <Field orientation="responsive">
+                    <FieldLabel htmlFor="process-category">
+                      Category
+                    </FieldLabel>
+                    <FieldContent>
+                      <Input
+                        id="process-category"
+                        name="process-category"
+                        placeholder="Manufacturing"
+                      />
+                      <FieldDescription>
+                        Optional grouping shown in the process inspector.
+                      </FieldDescription>
+                    </FieldContent>
+                  </Field>
+                  <Field>
+                    <FieldLabel htmlFor="process-amount">
+                      Production amount
+                    </FieldLabel>
+                    <FieldContent>
+                      <InputGroup>
+                        <InputGroupAddon>
+                          <InputGroupText>Qty</InputGroupText>
+                        </InputGroupAddon>
+                        <InputGroupInput
+                          id="process-amount"
+                          name="process-amount"
+                          type="number"
+                          inputMode="decimal"
+                          step="0.01"
+                          placeholder="1"
+                          defaultValue="1"
+                          aria-label="Production amount"
+                        />
+                        <InputGroupAddon align="inline-end">
+                          <InputGroupText className="text-xs font-medium uppercase tracking-wide">
+                            per ref.
+                          </InputGroupText>
+                        </InputGroupAddon>
+                      </InputGroup>
+                      <FieldDescription>
+                        Used to normalise exchanges for this process.
+                      </FieldDescription>
+                    </FieldContent>
+                  </Field>
+                  <Field>
+                    <FieldLabel htmlFor="process-description">
+                      Description
+                    </FieldLabel>
+                    <FieldContent>
+                      <InputGroup className="h-auto">
+                        <InputGroupAddon align="block-start">
+                          <InputGroupText>Notes</InputGroupText>
+                        </InputGroupAddon>
+                        <InputGroupTextarea
+                          id="process-description"
+                          name="process-description"
+                          placeholder="Optional supporting context"
+                          rows={3}
+                        />
+                      </InputGroup>
+                    </FieldContent>
+                  </Field>
+                </FieldSet>
+                <SheetFooter className="gap-2 sm:flex-row sm:justify-end">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => setActiveSheet(null)}
+                  >
+                    Cancel
+                  </Button>
+                  <Button type="submit">Create process</Button>
+                </SheetFooter>
+              </form>
+            </SheetContent>
+          </Sheet>
+
+          <Sheet
+            open={activeSheet === "exchange"}
+            onOpenChange={(open) => {
+              setActiveSheet(open ? "exchange" : null)
+              if (!open) exchangeFormRef.current?.reset()
+            }}
+          >
+            <SheetContent side="right" className="w-[420px] sm:w-[480px]">
+              <SheetHeader>
+                <SheetTitle>New exchange</SheetTitle>
+                <SheetDescription>
+                  Connect two processes with a quantified exchange.
+                </SheetDescription>
+              </SheetHeader>
+              <form ref={exchangeFormRef} onSubmit={handleAddExchange}>
+                <FieldSet className="gap-6 p-4">
+                  <FieldLegend className="mb-1 text-sm font-semibold">
+                    Link processes
+                  </FieldLegend>
+                  <FieldGroup className="gap-4">
+                    <Field orientation="responsive">
+                      <FieldLabel htmlFor="exchange-source">
+                        Source
+                      </FieldLabel>
+                      <FieldContent>
+                        <select
+                          id="exchange-source"
+                          name="exchange-source"
+                          className="rounded-md border border-input bg-background px-3 py-2 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                          defaultValue=""
+                          required
+                        >
+                          <option value="">Select process</option>
+                          {processOptions.map((option) => (
+                            <option key={option.id} value={option.id}>
+                              {option.label}
+                            </option>
+                          ))}
+                        </select>
+                        <FieldDescription>
+                          Origin process providing the flow.
+                        </FieldDescription>
+                      </FieldContent>
+                    </Field>
+                    <Field orientation="responsive">
+                      <FieldLabel htmlFor="exchange-target">
+                        Target
+                      </FieldLabel>
+                      <FieldContent>
+                        <select
+                          id="exchange-target"
+                          name="exchange-target"
+                          className="rounded-md border border-input bg-background px-3 py-2 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                          defaultValue=""
+                          required
+                        >
+                          <option value="">Select process</option>
+                          {processOptions.map((option) => (
+                            <option key={option.id} value={option.id}>
+                              {option.label}
+                            </option>
+                          ))}
+                        </select>
+                        <FieldDescription>
+                          Destination process receiving the flow.
+                        </FieldDescription>
+                      </FieldContent>
+                    </Field>
+                  </FieldGroup>
+
+                  <FieldSeparator />
+
+                  <Field>
+                    <FieldLabel htmlFor="exchange-name">
+                      Exchange label
+                    </FieldLabel>
+                    <FieldContent>
+                      <Input
+                        id="exchange-name"
+                        name="exchange-name"
+                        placeholder="Electricity - EU mix"
+                      />
+                      <FieldDescription>
+                        Optional descriptor used in legends and reports.
+                      </FieldDescription>
+                    </FieldContent>
+                  </Field>
+
+                  <FieldGroup className="gap-5">
+                    <Field orientation="responsive">
+                      <FieldLabel htmlFor="exchange-flow-type">
+                        Flow type
+                      </FieldLabel>
+                      <FieldContent>
+                        <InputGroup>
+                          <InputGroupAddon>
+                            <InputGroupText>Type</InputGroupText>
+                          </InputGroupAddon>
+                          <InputGroupInput
+                            id="exchange-flow-type"
+                            name="exchange-flow-type"
+                            placeholder="Material, energy, emission..."
+                          />
+                        </InputGroup>
+                      </FieldContent>
+                    </Field>
+                    <Field orientation="responsive">
+                      <FieldLabel htmlFor="exchange-unit">Unit</FieldLabel>
+                      <FieldContent>
+                        <InputGroup>
+                          <InputGroupAddon>
+                            <InputGroupText>Unit</InputGroupText>
+                          </InputGroupAddon>
+                          <InputGroupInput
+                            id="exchange-unit"
+                            name="exchange-unit"
+                            placeholder="kWh, kg, m³..."
+                          />
+                        </InputGroup>
+                      </FieldContent>
+                    </Field>
+                  </FieldGroup>
+
+                  <Field>
+                    <FieldLabel htmlFor="exchange-amount">Amount</FieldLabel>
+                    <FieldContent>
+                      <InputGroup>
+                        <InputGroupAddon>
+                          <InputGroupText>Qty</InputGroupText>
+                        </InputGroupAddon>
+                        <InputGroupInput
+                          id="exchange-amount"
+                          name="exchange-amount"
+                          type="number"
+                          inputMode="decimal"
+                          step="0.01"
+                          placeholder="Enter quantity"
+                          defaultValue="1"
+                          required
+                          aria-label="Exchange amount"
+                        />
+                      </InputGroup>
+                      <FieldDescription>
+                        Default quantity applied when creating the exchange.
+                      </FieldDescription>
+                    </FieldContent>
+                  </Field>
+                </FieldSet>
+                <SheetFooter className="gap-2 sm:flex-row sm:justify-end">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => setActiveSheet(null)}
+                  >
+                    Cancel
+                  </Button>
+                  <Button type="submit">Create exchange</Button>
+                </SheetFooter>
+              </form>
+            </SheetContent>
+          </Sheet>
         </div>
 
         <div className="mt-4 h-[560px] rounded-lg border">

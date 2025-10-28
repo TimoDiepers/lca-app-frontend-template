@@ -21,9 +21,15 @@ import {
   type PageId,
 } from "@/config/navigation"
 import { getPageDefinition } from "@/pages/page-registry"
-import { ChevronRight, Plus } from "lucide-react"
-import { Input } from "@/components/ui/input"
+import { BookOpen, Command, Plus, Search } from "lucide-react"
 import { Separator } from "@/components/ui/separator"
+import { ButtonGroup } from "@/components/ui/button-group"
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupInput,
+  InputGroupText,
+} from "@/components/ui/input-group"
 
 export default function Page() {
   const [activePage, setActivePage] = useState<PageId>(DEFAULT_PAGE)
@@ -72,21 +78,34 @@ export default function Page() {
               </BreadcrumbList>
             </Breadcrumb>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center justify-end gap-2 md:gap-3">
             <div className="hidden items-center gap-2 md:flex">
-              <Input
-                placeholder="Search datasets, processes, scenarios..."
-                className="h-9 w-[260px]"
-              />
-              <Button variant="outline" size="sm">
-                <ChevronRight className="mr-2 size-4" />
+              <InputGroup className="h-9 w-[280px]">
+                <InputGroupAddon>
+                  <Search className="size-4 text-muted-foreground" />
+                </InputGroupAddon>
+                <InputGroupInput
+                  placeholder="Search datasets, processes, scenarios..."
+                  aria-label="Global workspace search"
+                />
+                <InputGroupAddon align="inline-end">
+                  <InputGroupText>
+                    <Command className="size-3.5" />
+                    K
+                  </InputGroupText>
+                </InputGroupAddon>
+              </InputGroup>
+            </div>
+            <ButtonGroup className="h-9 overflow-hidden">
+              <Button variant="secondary" size="sm" className="h-9 gap-2">
+                <BookOpen className="mr-2 size-4" />
                 Knowledge base
               </Button>
-            </div>
-            <Button size="sm">
-              <PrimaryIcon className="mr-2 size-4" />
-              {primaryLabel}
-            </Button>
+              <Button size="sm" className="h-9 gap-2">
+                <PrimaryIcon className="mr-2 size-4" />
+                {primaryLabel}
+              </Button>
+            </ButtonGroup>
           </div>
         </header>
         <div className="flex flex-1 flex-col gap-4 p-6 pb-8">

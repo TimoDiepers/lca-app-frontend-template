@@ -1,4 +1,9 @@
 import { Button } from "@/components/ui/button"
+import {
+  ButtonGroup,
+  ButtonGroupSeparator,
+  ButtonGroupText,
+} from "@/components/ui/button-group"
 import { DEFAULT_PAGE, type PageId } from "@/config/navigation"
 import type { CSSProperties } from "react"
 import {
@@ -18,11 +23,23 @@ import {
   Share2,
   SlidersHorizontal,
   Sparkles,
+  Search,
   Timer,
   Workflow,
 } from "lucide-react"
 import { ProcessEditorWorkspace } from "@/pages/process-editor/ProcessEditorWorkspace"
 import type { LucideIcon } from "lucide-react"
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupInput,
+  InputGroupText,
+} from "@/components/ui/input-group"
+import {
+  FieldGroup,
+  FieldLegend,
+  FieldSet,
+} from "@/components/ui/field"
 import {
   Area,
   AreaChart,
@@ -297,14 +314,38 @@ const ProjectOverviewContent = () => (
 
     <section className="grid gap-4 lg:grid-cols-3">
       <div className={`${cardClass} lg:col-span-2`}>
-        <div className="flex items-center justify-between">
+        <div className="flex flex-wrap items-center justify-between gap-3">
           <h2 className="text-sm font-semibold">
             Timeline & calculation runs
           </h2>
-          <Button variant="ghost" size="sm" className="h-8 px-2">
-            <RefreshCw className="mr-2 size-4" />
-            Sync latest
-          </Button>
+          <div className="flex flex-1 flex-col items-stretch gap-2 sm:flex-row sm:justify-end">
+            <InputGroup className="h-8 sm:w-[240px]">
+              <InputGroupAddon>
+                <Search className="size-3.5 text-muted-foreground" />
+              </InputGroupAddon>
+              <InputGroupInput
+                placeholder="Filter activity..."
+                aria-label="Filter calculation runs"
+              />
+              <InputGroupAddon align="inline-end">
+                <InputGroupText className="gap-1 text-xs uppercase tracking-wide">
+                  <SlidersHorizontal className="size-3.5" />
+                  Sort
+                </InputGroupText>
+              </InputGroupAddon>
+            </InputGroup>
+            <ButtonGroup className="h-8 overflow-hidden">
+              <Button variant="outline" size="sm" className="h-8 gap-2">
+                <RefreshCw className="size-3.5" />
+                Sync
+              </Button>
+              <ButtonGroupSeparator />
+              <Button variant="outline" size="sm" className="h-8 gap-2">
+                <Share2 className="size-3.5" />
+                Export log
+              </Button>
+            </ButtonGroup>
+          </div>
         </div>
         <ul className="mt-4 space-y-4 text-sm">
           <li className="flex items-start justify-between gap-4">
@@ -367,28 +408,64 @@ const ProjectOverviewContent = () => (
               <span className="font-medium">EF 3.1 Climate</span>
             </li>
           </ul>
-        </div>
-        <div className={cardClass}>
-          <h2 className="text-sm font-semibold">Quick actions</h2>
-          <div className="mt-3 flex flex-wrap gap-2">
-            <Button size="sm" variant="secondary" className="gap-2">
-              <Plus className="size-4" />
-              New process
-            </Button>
-            <Button size="sm" variant="secondary" className="gap-2">
-              <Download className="size-4" />
-              Import inventory
-            </Button>
-            <Button size="sm" variant="secondary" className="gap-2">
-              <CalendarDays className="size-4" />
-              Schedule run
-            </Button>
-          </div>
-          <p className="mt-4 text-xs text-muted-foreground">
-            Use templates to clone datasets, or launch comparison directly from
-            a scenario.
-          </p>
-        </div>
+      </div>
+      <div className={cardClass}>
+        <h2 className="text-sm font-semibold">Quick actions</h2>
+        <FieldSet className="mt-3 gap-3">
+          <FieldLegend className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+            Templates
+          </FieldLegend>
+          <FieldGroup className="gap-0">
+            <ButtonGroup orientation="vertical" className="w-full">
+              <Button
+                size="sm"
+                variant="secondary"
+                className="justify-between gap-2"
+              >
+                <span className="flex items-center gap-2">
+                  <Plus className="size-4" />
+                  New process
+                </span>
+                <ButtonGroupText className="bg-transparent border-0 px-0 text-xs text-muted-foreground">
+                  Cmd&nbsp;+&nbsp;N
+                </ButtonGroupText>
+              </Button>
+              <ButtonGroupSeparator orientation="horizontal" />
+              <Button
+                size="sm"
+                variant="secondary"
+                className="justify-between gap-2"
+              >
+                <span className="flex items-center gap-2">
+                  <Download className="size-4" />
+                  Import inventory
+                </span>
+                <ButtonGroupText className="bg-transparent border-0 px-0 text-xs text-muted-foreground">
+                  CSV/ILCD
+                </ButtonGroupText>
+              </Button>
+              <ButtonGroupSeparator orientation="horizontal" />
+              <Button
+                size="sm"
+                variant="secondary"
+                className="justify-between gap-2"
+              >
+                <span className="flex items-center gap-2">
+                  <CalendarDays className="size-4" />
+                  Schedule run
+                </span>
+                <ButtonGroupText className="bg-transparent border-0 px-0 text-xs text-muted-foreground">
+                  Next slot
+                </ButtonGroupText>
+              </Button>
+            </ButtonGroup>
+          </FieldGroup>
+        </FieldSet>
+        <p className="mt-4 text-xs text-muted-foreground">
+          Use templates to clone datasets, or launch comparison directly from
+          a scenario.
+        </p>
+      </div>
       </div>
     </section>
   </div>
