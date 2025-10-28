@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button"
 import { DEFAULT_PAGE, type PageId } from "@/config/navigation"
-import type { CSSProperties, FC } from "react"
+import type { CSSProperties } from "react"
 import {
   AlertTriangle,
   Anchor,
