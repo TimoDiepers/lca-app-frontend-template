@@ -15,6 +15,7 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar"
+import { ThemeToggle } from "@/components/theme-toggle"
 import {
   DEFAULT_PAGE,
   findSectionByPage,
@@ -106,6 +107,7 @@ export default function Page() {
                 {primaryLabel}
               </Button>
             </ButtonGroup>
+            <ThemeToggle />
           </div>
         </header>
         <div className="flex flex-1 flex-col gap-4 p-6 pb-8">
